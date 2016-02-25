@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Backlog Grooming Stuff</title>
+    <link href="css/bootstrap.css" rel="stylesheet" />
+
+</head>
+<body style="font-family:Verdana">
+  <div class="container">
+<div class="row " style="padding-top:40px;">
+    <h3 class="text-center" >ADMIN: Backlog Grooming Stuff</h3>
+    <br /><br />
+    <div class="col-md-6">
+        <div class="panel panel-info">
+        	<div class="panel-heading">
+                Backlog Things
+            </div>
+            <div class="panel-body" id="backlogItems">
+            </div>
+            <div class="panel-footer">
+                <div class="input-group">
+                    <input id=adminInput type="text" class="form-control" placeholder="Enter Message" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-info" type="button">SEND</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-info" style="height: 100%; position: relative;">
+            <div class="panel-heading">
+                CHAT
+            </div>
+            <div class="panel-body" id="box" style="height: 550px; overflow-y:scroll;margin-bottom: 40px;">
+            </div>
+            <div class="panel-footer" style="position: absolute; bottom: 0;">
+                <div class="input-group">
+                    <input id=input type="text" class="form-control" placeholder="Enter Message" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-info" type="button">SEND</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  </div>
+
+<script src=http://cdn.pubnub.com/pubnub.min.js></script>
+<script>(function(){
+var box = PUBNUB.$('box'), input = PUBNUB.$('input'), channel = 'tonyChat';
+PUBNUB.subscribe({
+    channel  : channel,
+    callback : function(text) { 
+    	box.innerHTML = box.innerHTML + (''+text).replace( /[<>]/g, '' ) + '<br>' + '<hr />';
+		box.scrollTop = box.scrollHeight;
+	}
+});
+PUBNUB.bind( 'keyup', input, function(e) {
+    (e.keyCode || e.charCode) === 13 && PUBNUB.publish({
+        channel : channel, message : input.value, x : (input.value='')
+    })
+});
+
+var items = PUBNUB.$('backlogItems'), adminInput = PUBNUB.$('adminInput'), adminChannel = 'adminBacklogStuff';
+PUBNUB.subscribe({
+    channel  : adminChannel,
+    callback : function(text) { 
+        items.innerHTML = ''+text;
+    }
+});
+PUBNUB.bind( 'keyup', adminInput, function(e) {
+    (e.keyCode || e.charCode) === 13 && PUBNUB.publish({
+        channel : adminChannel, message : adminInput.value, x : (adminInput.value='')
+    })
+});
+})()</script>
+
+</body>
+
+</html>
